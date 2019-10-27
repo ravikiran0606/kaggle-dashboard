@@ -1,10 +1,12 @@
 import { put, call, all, takeLatest } from 'redux-saga/effects';
 import { getAllData } from './api';
 import { actionTypes, getAllDataSuccess, getAllDataFail } from './actions';
+import { buildOptions } from './utils';
 
-function* fetchData() {
+function* fetchData(action) {
   try {
-    const data = yield call(getAllData);
+    const options = buildOptions(action)
+    const data = yield call(getAllData, options);
     yield put(getAllDataSuccess(data));
   } catch (err) {
     yield put(getAllDataFail(err));

@@ -4,8 +4,9 @@ export const actionTypes = {
   GET_ALL_DATA_FAIL: 'GET_ALL_DATA_FAIL',
 };
 
-export const getAllData = () => ({
+export const getAllData = options => ({
   type: actionTypes.GET_ALL_DATA,
+  ...options,
 });
 
 export const getAllDataSuccess = data => ({

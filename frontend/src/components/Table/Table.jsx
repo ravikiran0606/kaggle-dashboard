@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useTable } from 'react-table';
+import TableHeader from './components/TableHeader';
 import columns from './columns';
 import { renderIf } from '../../utils';
-
 
 const Table = ({ data, loading, error, fetchData }) => {
   useEffect(() => {
@@ -11,6 +11,7 @@ const Table = ({ data, loading, error, fetchData }) => {
       fetchData();
     }
   });
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -18,23 +19,12 @@ const Table = ({ data, loading, error, fetchData }) => {
     rows,
     prepareRow,
   } = useTable({ columns, data });
+
   return renderIf(() => data.length > 0, () => {
     const tableClass = "table table-striped table-bordered table-hover table-responsive-md"
     return (
       <table { ...getTableProps({ className: tableClass }) }>
-        <thead>
-          {
-            headerGroups.map(headerGroup => (
-              <tr { ...headerGroup.getHeaderGroupProps() }>
-                {
-                  headerGroup.headers.map(column => (
-                    <th scope="col" {...column.getHeaderProps()}>{column.render('Header')}</th>
-                  ))
-                }
-              </tr>
-            ))
-          }
-        </thead>
+        <TableHeader fetchData={fetchData} headerGroups={headerGroups} />
         <tbody { ...getTableBodyProps() }>
           {
             rows.map(row => (
