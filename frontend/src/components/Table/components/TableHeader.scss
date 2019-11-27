@@ -1,0 +1,14 @@
+.header {
+  span {
+    display: flex;
+    justify-content: space-between;
+    
+    .actions {
+      .material-icons {
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
