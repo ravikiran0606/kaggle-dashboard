@@ -4,6 +4,7 @@ import pyrebase
 import pandas as pd
 import ast
 import json
+import numpy as np
 
 config = {
     "apiKey": "AIzaSyBVojd4HVQdliJRPH2FjinEZF4YUlRSxwI",
@@ -62,5 +63,49 @@ def getDataFiltered():
     df.reset_index(inplace=True)
     df.drop(columns=["index"], inplace=True)
     converted_json = df.to_json(orient="index")
+    response_result = json.loads(converted_json)
+    return response_result
+
+@app.route('/getDataFilteredStrings', methods=['GET', 'POST'])
+def getDataFilteredStrings():
+    filterCol = request.args.get("filterCol")
+    matchString = request.args.get("matchString")
+    matchString = matchString.lower()
+    print(filterCol, matchString)
+    db_response = db.child("athlete_events").get().val()
+    df = pd.DataFrame(db_response)
+    df = df[df[filterCol] != "NA"]
+    df = df[df[filterCol].str.lower().str.contains(matchString)]
+    df.drop_duplicates(inplace=True)
+    df.reset_index(inplace=True)
+    df.drop(columns=["index"], inplace=True)
+    converted_json = df.to_json(orient="index")
+    response_result = json.loads(converted_json)
+    return response_result
+
+@app.route('/getDataStatistics', methods=['GET', 'POST'])
+def getDataStatistics():
+    statsCol = request.args.get("statsCol")
+    print(statsCol)
+    db_response = db.child("athlete_events").get().val()
+    df = pd.DataFrame(db_response)
+    df = df[df[statsCol] != "NA"]
+    result_dict = dict(df[statsCol].astype(np.float64).describe())
+    converted_json = json.dumps(result_dict)
+    response_result = json.loads(converted_json)
+    return response_result
+
+@app.route('/getDataStatisticsStrings', methods=['GET', 'POST'])
+def getDataStatisticsStrings():
+    statsCol = request.args.get("statsCol")
+    print(statsCol)
+    db_response = db.child("athlete_events").get().val()
+    df = pd.DataFrame(db_response)
+    df = df[df[statsCol] != "NA"]
+    result_dict = dict(df[statsCol].describe())
+    result_dict["count"] = np.float64(result_dict["count"])
+    result_dict["unique"] = np.float64(result_dict["unique"])
+    result_dict["freq"] = np.float64(result_dict["freq"])
+    converted_json = json.dumps(result_dict)
     response_result = json.loads(converted_json)
     return response_result
