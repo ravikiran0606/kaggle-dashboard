@@ -27,85 +27,74 @@ def main():
 def getData():
     db_response = db.child("athlete_events").get().val()
     df = pd.DataFrame(db_response)
-    converted_json = df.to_json(orient="index")
-    response_result = json.loads(converted_json)
-    return response_result
+    converted_json = df.to_json(orient="records")
+    return converted_json
 
 @app.route('/getDataSorted', methods=['GET', 'POST'])
 def getDataSorted():
-    sortCol = ast.literal_eval(request.args.get("sortCol"))
-    sortType = ast.literal_eval(request.args.get("ascending"))
-    print(sortCol, sortType)
+    sortCol = request.args.get("col")
+    sortOrder = request.args.get("order")
     db_response = db.child("athlete_events").get().val()
     df = pd.DataFrame(db_response)
-    df.sort_values(by=sortCol, ascending=sortType, inplace=True)
-    df.reset_index(inplace=True)
-    df.drop(columns=["index"], inplace=True)
-    converted_json = df.to_json(orient="index")
-    response_result = json.loads(converted_json)
-    return response_result
+    df.sort_values(by=sortCol, ascending=(sortOrder == 'asc'), inplace=True)
+    df.reset_index(inplace=True, drop=True)
+    converted_json = df.to_json(orient="records")
+    return converted_json
 
 @app.route('/getDataFiltered', methods=['GET', 'POST'])
 def getDataFiltered():
     filterCol = request.args.get("filterCol")
-    colType = "number"
+    colType = request.args.get("type")
     startVal = request.args.get("startVal")
+    matchString = request.args.get("matchString")
     endVal = request.args.get("endVal")
-    print(filterCol, colType, startVal, endVal)
+    print(filterCol, colType, matchString, startVal, endVal)
     db_response = db.child("athlete_events").get().val()
     df = pd.DataFrame(db_response)
-    df = df[df[filterCol]!="NA"]
+    df = df[df[filterCol] != "NA"]
     df.drop_duplicates(inplace=True)
+    if colType == 'string':
+        df = df[df[filterCol].str.lower().str.contains(matchString.lower())]
     if colType == "number":
         df[filterCol] = pd.to_numeric(df[filterCol])
         df = df[(df[filterCol] >= int(startVal)) & (df[filterCol] <= int(endVal))]
         df.sort_values(by=filterCol, inplace=True)
-    df.reset_index(inplace=True)
-    df.drop(columns=["index"], inplace=True)
-    converted_json = df.to_json(orient="index")
-    response_result = json.loads(converted_json)
-    return response_result
-
-@app.route('/getDataFilteredStrings', methods=['GET', 'POST'])
-def getDataFilteredStrings():
-    filterCol = request.args.get("filterCol")
-    matchString = request.args.get("matchString")
-    matchString = matchString.lower()
-    print(filterCol, matchString)
-    db_response = db.child("athlete_events").get().val()
-    df = pd.DataFrame(db_response)
-    df = df[df[filterCol] != "NA"]
-    df = df[df[filterCol].str.lower().str.contains(matchString)]
-    df.drop_duplicates(inplace=True)
-    df.reset_index(inplace=True)
-    df.drop(columns=["index"], inplace=True)
-    converted_json = df.to_json(orient="index")
-    response_result = json.loads(converted_json)
-    return response_result
+    df.reset_index(inplace=True, drop=True)
+    converted_json = df.to_json(orient="records")
+    return converted_json
 
 @app.route('/getDataStatistics', methods=['GET', 'POST'])
 def getDataStatistics():
-    statsCol = request.args.get("statsCol")
-    print(statsCol)
+    columns = {
+        "ID": "number",
+        "Name": "string",
+        "Sex": "string",
+        "Age": "number",
+        "Height": "number",
+        "Weight": "number",
+        "Team": "string",
+        "NOC": "string",
+        "Games": "string",
+        "Year": "number",
+        "Season": "string",
+        "City": "string",
+        "Sport": "string",
+        "Event": "string",
+        "Medal": "string",
+    }
     db_response = db.child("athlete_events").get().val()
     df = pd.DataFrame(db_response)
-    df = df[df[statsCol] != "NA"]
-    result_dict = dict(df[statsCol].astype(np.float64).describe())
-    converted_json = json.dumps(result_dict)
-    response_result = json.loads(converted_json)
-    return response_result
-
-@app.route('/getDataStatisticsStrings', methods=['GET', 'POST'])
-def getDataStatisticsStrings():
-    statsCol = request.args.get("statsCol")
-    print(statsCol)
-    db_response = db.child("athlete_events").get().val()
-    df = pd.DataFrame(db_response)
-    df = df[df[statsCol] != "NA"]
-    result_dict = dict(df[statsCol].describe())
-    result_dict["count"] = np.float64(result_dict["count"])
-    result_dict["unique"] = np.float64(result_dict["unique"])
-    result_dict["freq"] = np.float64(result_dict["freq"])
+    df = df[df[df.columns] != "NA"]
+    result_dict = dict()
+    for col in df.columns:
+        if columns[col] == 'number':
+            col_stats = dict(df[col].astype(np.float64).describe())
+        else:
+            col_stats = dict(df[col].describe())
+            col_stats["count"] = np.float64(col_stats["count"])
+            col_stats["unique"] = np.float64(col_stats["unique"])
+            col_stats["freq"] = np.float64(col_stats["freq"])
+        result_dict[col] = col_stats
     converted_json = json.dumps(result_dict)
     response_result = json.loads(converted_json)
     return response_result

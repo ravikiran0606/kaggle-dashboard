@@ -1,0 +1,28 @@
+.pagination {
+  display: flex;
+  flex-direction: column;
+
+  &__actions {
+    button {
+      margin: 0.5rem;
+    }
+  }
+
+  &__indicator {
+    margin: 0.5rem;
+    display: inline-block;
+
+    &__goto {
+      display: inline-block;
+      width: 70%;
+      margin-right: 0.5rem;
+      
+      .form-control {
+        display: inline;
+        width: fit-content;
+        margin-right: 0.5rem;
+        margin-left: 0.5rem;
+      }
+    }
+  }
+}

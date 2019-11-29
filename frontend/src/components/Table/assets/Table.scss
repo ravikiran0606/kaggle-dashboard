@@ -1,0 +1,11 @@
+.table-wrapper {
+  overflow-x: auto;
+  margin: 1rem;
+  border: 1px solid #dee2e6;
+  padding: 1rem;
+  overflow-inline: clip;
+
+  .table {
+    margin-bottom: 0;
+  }
+}
