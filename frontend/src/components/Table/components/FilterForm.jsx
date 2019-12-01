@@ -8,7 +8,9 @@ const FilterForm = ({ type, onChange }) => (
       renderIf(() => type === 'number', () => (
         <div className="filter-form__number">
           Start: <input name="start" onChange={e => onChange('start', parseInt(e.target.value, 10))} />
+          <br />
           End: <input name="end" onChange={e => onChange('end', parseInt(e.target.value, 10))} />
+          <br />
           <button onClick={() => onChange('filter', true)}>Filter</button>
         </div>
       ))

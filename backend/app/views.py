@@ -1,19 +1,20 @@
 from app import app
 from flask import Flask, current_app, jsonify, flash, render_template, json, request, redirect, session, url_for
+from dotenv import load_dotenv
 import pyrebase
 import pandas as pd
 import ast
 import json
+import os
 import numpy as np
 
+load_dotenv()
+
 config = {
-    "apiKey": "AIzaSyBVojd4HVQdliJRPH2FjinEZF4YUlRSxwI",
-    "authDomain": "kaggledashboard-1556d.firebaseapp.com",
-    "databaseURL": "https://kaggledashboard-1556d.firebaseio.com",
-    "projectId": "kaggledashboard-1556d",
-    "storageBucket": "kaggledashboard-1556d.appspot.com",
-    "serviceAccount": "app/kaggledashboard-1556d-firebase-adminsdk-brhoj-e4d59e3d2d.json",
-    "messagingSenderId": "33015475582"
+    "apiKey": os.getenv("API_KEY"),
+    "authDomain": os.getenv("AUTH_DOMAIN"),
+    "databaseURL": os.getenv("DATABASE_URL"),
+    "storageBucket": os.getenv("STORAGE_BUCKET"),
 }
 
 firebase = pyrebase.initialize_app(config)
@@ -48,7 +49,6 @@ def getDataFiltered():
     startVal = request.args.get("startVal")
     matchString = request.args.get("matchString")
     endVal = request.args.get("endVal")
-    print(filterCol, colType, matchString, startVal, endVal)
     db_response = db.child("athlete_events").get().val()
     df = pd.DataFrame(db_response)
     df = df[df[filterCol] != "NA"]

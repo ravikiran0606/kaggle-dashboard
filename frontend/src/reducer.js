@@ -10,7 +10,7 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.GET_ALL_DATA:
-      return { ...initialState, loading: true };
+      return { ...state, loading: true, data: [], error: null };
     case actionTypes.GET_ALL_DATA_SUCCESS:
       return { ...state, data: [...action.data], loading: false };
     case actionTypes.GET_ALL_DATA_FAIL:

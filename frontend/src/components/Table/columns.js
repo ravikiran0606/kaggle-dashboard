@@ -9,7 +9,7 @@ const columns = {
   NOC: 'string',
   Games: 'string',
   Year: 'number',
-  Season: 'number',
+  Season: 'string',
   City: 'string',
   Sport: 'string',
   Event: 'string',

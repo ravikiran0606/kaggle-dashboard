@@ -33,43 +33,58 @@ const Table = ({ data, stats, loading, error, fetchData, fetchStats }) => {
     setPageSize,
   } = useTable({ columns, data, initialState: { pageIndex: 0 } }, usePagination);
 
-  return renderIf(() => data.length > 0, () => {
-    const tableClass = "table table-striped table-bordered table-hover table-responsive-md"
-    return (
-      <>
-        <Pagination
-          gotoPage={gotoPage}
-          previousPage={previousPage}
-          nextPage={nextPage}
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          pageCount={pageCount}
-          pageOptions={pageOptions}
-          canPreviousPage={canPreviousPage}
-          canNextPage={canNextPage}
-          setPageSize={setPageSize}
-        />
-        <div className="table-wrapper">
-          <table { ...getTableProps({ className: tableClass }) }>
-            <TableHeader fetchData={fetchData} headerGroups={headerGroups} stats={stats} />
-            <tbody { ...getTableBodyProps() }>
-              {
-                page.map(row => (
-                  prepareRow(row) || (
-                    <tr { ...row.getRowProps() }>
-                      {
-                        row.cells.map(cell => <td { ...cell.getCellProps() }>{cell.render('Cell')}</td>)
-                      }
-                    </tr>
-                  )
-                ))
-              }
-            </tbody>
-          </table>
-        </div>
-      </>
-    );
-  });
+  return (
+    <>
+      {
+        renderIf(() => data.length > 0, () => {
+          const tableClass = "table table-striped table-bordered table-hover table-responsive-md"
+          return (
+            <>
+              <Pagination
+                gotoPage={gotoPage}
+                previousPage={previousPage}
+                nextPage={nextPage}
+                pageIndex={pageIndex}
+                pageSize={pageSize}
+                pageCount={pageCount}
+                pageOptions={pageOptions}
+                canPreviousPage={canPreviousPage}
+                canNextPage={canNextPage}
+                setPageSize={setPageSize}
+              />
+              <div className="table-wrapper">
+                <table { ...getTableProps({ className: tableClass }) }>
+                  <TableHeader fetchData={fetchData} headerGroups={headerGroups} stats={stats} />
+                  <tbody { ...getTableBodyProps() }>
+                    {
+                      page.map(row => (
+                        prepareRow(row) || (
+                          <tr { ...row.getRowProps() }>
+                            {
+                              row.cells.map(cell => <td { ...cell.getCellProps() }>{cell.render('Cell')}</td>)
+                            }
+                          </tr>
+                        )
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </>
+          );
+        })
+      }
+      {
+        renderIf(() => loading, () => (
+          <div className="d-flex justify-content-center progress-wrapper">
+            <div className="spinner-border" role="status">
+              <span className="sr-only">Loading...</span>
+            </div>
+          </div>
+        ))
+      }
+    </>
+  );
 };
 
 Table.propTypes = {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Popup from 'reactjs-popup';
 import FilterForm from './FilterForm';
+import Plot from './Plot';
 import { renderIf, renderIfElse } from '../../../utils';
 
 import './assets/TableHeader.scss';
@@ -56,6 +57,16 @@ const TableHeader = ({ headerGroups, fetchData, stats }) => {
                           >
                             <FilterForm type={column.type} onChange={onChange(column.render('Header'), column.type)} />
                           </Popup>
+                          {
+                            renderIf(() => !['ID', 'Name'].includes(column.Header), () => (
+                              <Popup
+                                trigger={<i className="material-icons">bar_chart</i>}
+                                position="right top"
+                              >
+                                <Plot column={column.Header} />
+                              </Popup>
+                            ))
+                          }
                         </span>
                       </span>
                     </th>
@@ -76,7 +87,14 @@ const TableHeader = ({ headerGroups, fetchData, stats }) => {
                               () => <span />,
                               () => (
                                 <>
-                                  { Object.keys(stats[column.Header]).map(key => <p key={key}>{`${key}: ${stats[column.Header][key]}`}</p>) }
+                                  { 
+                                    Object.keys(stats[column.Header]).map(key => (
+                                      <div key={key} className="stats">
+                                        <span className="stats__key">{`${key[0].toUpperCase()}${key.substr(1)}: `}</span>
+                                        <span className="stats__value">{stats[column.Header][key]}</span>
+                                      </div>
+                                    )) 
+                                  }
                                 </>
                               ),
                             )
