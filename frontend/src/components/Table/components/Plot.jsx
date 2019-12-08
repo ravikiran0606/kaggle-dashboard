@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
+import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar, Label } from 'recharts';
 import _ from 'lodash';
 
 const Plot = ({ data, column }) => {
@@ -9,18 +9,6 @@ const Plot = ({ data, column }) => {
     x: key,
     y: val,
   }));
-  console.log(counts);
-  // return (
-  //   <Plotly
-  //     data={[
-  //       {
-  //         x: counts[0],
-  //         y: counts[1],
-  //         type: 'bar',
-  //       }
-  //     ]}
-  //   />
-  // )
   return (
     <BarChart
       width={500}
@@ -31,8 +19,12 @@ const Plot = ({ data, column }) => {
       }}
     >
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="x" />
-      <YAxis />
+      <XAxis dataKey="x">
+        <Label value="Values" offset={0} position="insideBottom" />
+      </XAxis>
+      <YAxis>
+        <Label value="Count" angle={-90} position="insideLeft" />
+      </YAxis>
       <Tooltip />
       <Bar dataKey="y" fill="#0000ff" />
     </BarChart>
